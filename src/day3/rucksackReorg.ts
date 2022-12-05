@@ -32,26 +32,63 @@ const readFileInput = (inputPath: string) => {
     .split('\n');
 };
 
+const organizeIntoGroupsOfThree = (inputStrs: string[]) => {
+  let groupsOfThree = [];
+  for (let i = 0; i < inputStrs.length; i += 3) {
+    groupsOfThree.push(inputStrs.slice(i, i + 3));
+  }
+
+  return groupsOfThree;
+};
+
+const calculatePartOneTypes = (inputLines: string[]) => {
+  const splitValues = inputLines.map((line) => {
+    return parseSingleLineIntoTwo(line);
+  });
+
+  let typeArr = [];
+  for (let i = 0; i < splitValues.length; i++) {
+    for (let j = 0; j < splitValues[i][0].length; j++) {
+      if (splitValues[i][1].indexOf(splitValues[i][0][j]) !== -1) {
+        typeArr.push(splitValues[i][0][j]);
+        break;
+      }
+    }
+  }
+  return typeArr;
+};
+
+const calculatePartTwoTypes = (threeLineInputArr: string[][]) => {
+  let typeArr = [];
+
+  for (let i = 0; i < threeLineInputArr.length; i++) {
+    for (let j = 0; j < threeLineInputArr[i][0].length; j++) {
+      const charToCheck = threeLineInputArr[i][0][j];
+      const secondLineCheck =
+        threeLineInputArr[i][1].indexOf(charToCheck) !== -1;
+      const thirdLineCheck =
+        threeLineInputArr[i][2].indexOf(charToCheck) !== -1;
+
+      if (secondLineCheck && thirdLineCheck) {
+        typeArr.push(charToCheck);
+        break;
+      }
+    }
+  }
+  return typeArr;
+};
+
+const determineResult = (typeArr: string[]) =>
+  typeArr.reduce((total, item) => total + calculateKeyScore(item), 0);
+
 // main
 console.info(
   (() => {
-    const lines = readFileInput('./input.txt');
-    const splitValues = lines.map((line) => {
-      return parseSingleLineIntoTwo(line);
-    });
+    const inputLines = readFileInput('./inputs/input.txt');
+    const tresLineas = organizeIntoGroupsOfThree(inputLines);
+    const partOneTypes = calculatePartOneTypes(inputLines);
+    const partTwoTypes = calculatePartTwoTypes(tresLineas);
 
-    let typeArr = [];
-    for (let i = 0; i < splitValues.length; i++) {
-      for (let j = 0; j < splitValues[i][0].length; j++) {
-        if (splitValues[i][1].indexOf(splitValues[i][0][j]) !== -1) {
-          typeArr.push(splitValues[i][0][j]);
-          break;
-        }
-      }
-    }
-
-    return typeArr.reduce((total, item) => {
-      return total + calculateKeyScore(item);
-    }, 0);
+    return [determineResult(partOneTypes), determineResult(partTwoTypes)];
   })()
 );
