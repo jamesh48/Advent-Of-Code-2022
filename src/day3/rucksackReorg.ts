@@ -1,12 +1,5 @@
-// Hardcode out a map of string to number values.
-// Split the input on the new line
-// for each array item, split the string into two parts based on the middle item
-// loop over one of the parts, check if indexOf !== -1 for each character of the first part vs all the characters of the second part
-// when a find is made, break the loop and push the result to an array.
-// reduce over that array comparing with the hardcoded map and return the score for each, and adding to the total.
-
-import * as fs from 'fs';
-import * as path from 'path';
+import { readInputLines } from '@utils';
+import { Part } from '@types';
 
 const calculateKeyScore = (char: string) => {
   if (char.charCodeAt(0) <= 90) {
@@ -24,21 +17,6 @@ const parseSingleLineIntoTwo = (singleLine: string) => {
   const first = singleLine.slice(0, mid);
   const second = singleLine.slice(mid);
   return [first, second];
-};
-
-const readFileInput = (inputPath: string) => {
-  return fs
-    .readFileSync(path.resolve(__dirname, inputPath), 'utf-8')
-    .split('\n');
-};
-
-const organizeIntoGroupsOfThree = (inputStrs: string[]) => {
-  let groupsOfThree = [];
-  for (let i = 0; i < inputStrs.length; i += 3) {
-    groupsOfThree.push(inputStrs.slice(i, i + 3));
-  }
-
-  return groupsOfThree;
 };
 
 const calculatePartOneTypes = (inputLines: string[]) => {
@@ -81,14 +59,24 @@ const calculatePartTwoTypes = (threeLineInputArr: string[][]) => {
 const determineResult = (typeArr: string[]) =>
   typeArr.reduce((total, item) => total + calculateKeyScore(item), 0);
 
-// main
-console.info(
-  (() => {
-    const inputLines = readFileInput('./inputs/input.txt');
-    const tresLineas = organizeIntoGroupsOfThree(inputLines);
-    const partOneTypes = calculatePartOneTypes(inputLines);
-    const partTwoTypes = calculatePartTwoTypes(tresLineas);
+const main = (inputPath: string, part: Part) => {
+  const inputLines = readInputLines(inputPath, { splitBy: '\n' }) as string[];
+  const tresLineas = readInputLines(inputPath, {
+    splitBy: '\n',
+    groupBy: 3,
+  }) as string[][];
+  const partOneTypes = calculatePartOneTypes(inputLines);
+  const partTwoTypes = calculatePartTwoTypes(tresLineas);
 
-    return [determineResult(partOneTypes), determineResult(partTwoTypes)];
-  })()
-);
+  if (part === 'pt1') {
+    return determineResult(partOneTypes);
+  }
+
+  if (part === 'pt2') {
+    return determineResult(partTwoTypes);
+  }
+
+  throw new Error('Part must be defined!');
+};
+
+export default main;

@@ -1,0 +1,6 @@
+Hardcode out a map of string to number values.
+Split the input on the new line
+for each array item, split the string into two parts based on the middle item
+loop over one of the parts, check if indexOf !== -1 for each character of the first part vs all the characters of the second part
+when a find is made, break the loop and push the result to an array.
+reduce over that array comparing with the hardcoded map and return the score for each, and adding to the total.

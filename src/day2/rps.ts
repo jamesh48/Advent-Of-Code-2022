@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import { readInputLines } from '@utils';
+import { Part } from '@types';
 
 const partOneWinSelectionMatrix: {
   [key: string]: { [key: string]: { score: number } };
@@ -19,24 +19,29 @@ const calculateChosenScore = (opponentMove: string, mySelection: string) => {
   return partTwoSelectionMatrix[opponentMove][mySelection];
 };
 
-const calculateIndividualScore = ([opponentMove, myMove]: string[]) => {
-  return partOneWinSelectionMatrix[opponentMove][
-    calculateChosenScore(opponentMove, myMove)
-  ]['score'];
+const calculateIndividualScore = (
+  [opponentMove, myMove]: string[],
+  part: 'pt1' | 'pt2'
+) => {
+  if (part === 'pt1') {
+    return partOneWinSelectionMatrix[opponentMove][myMove].score;
+  }
+  if (part === 'pt2') {
+    return partOneWinSelectionMatrix[opponentMove][
+      calculateChosenScore(opponentMove, myMove)
+    ]['score'];
+  }
+  throw new Error('Part must be defined!');
 };
-// Part one Solution
-console.info(
-  (() => {
-    const readFileInput = fs.readFileSync(
-      path.join(__dirname, './input.txt'),
-      'utf-8'
-    );
 
-    return readFileInput
-      .split('\n')
-      .map((x) => x.split(' '))
-      .reduce((total, item) => {
-        return total + calculateIndividualScore(item);
-      }, 0);
-  })()
-);
+// Main
+const main = (inputPath: string, part: Part) => {
+  const inputLines = readInputLines(inputPath, { splitBy: '\n' }) as string[];
+  return inputLines
+    .map((x) => x.split(' '))
+    .reduce((total, item) => {
+      return total + calculateIndividualScore(item, part);
+    }, 0);
+};
+
+export default main;

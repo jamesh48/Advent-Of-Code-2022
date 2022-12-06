@@ -1,12 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
-(() => {
-  const readFileResult = fs.readFileSync(
-    path.join(__dirname, './input.txt'),
-    'utf-8'
-  );
-  const arrSplit = readFileResult.split('\n\n');
-  const parsedResults = arrSplit.map((numListStr) => {
+import { readInputLines } from '@utils';
+import { Part } from '@types';
+
+const main = (inputPath: string, part: Part) => {
+  const inputLines = readInputLines(inputPath, {
+    splitBy: '\n\n',
+  }) as string[];
+  const parsedResults = inputLines.map((numListStr) => {
     const parsed = numListStr.split('\n');
     const numbers = parsed.map((x) => Number(x));
     return numbers.reduce((total, item) => {
@@ -16,8 +15,10 @@ import * as path from 'path';
 
   // Answer One
   const answerOne = Math.max(...parsedResults);
-  console.info(answerOne);
 
+  if (part === 'pt1') {
+    return answerOne;
+  }
   parsedResults.sort((a, b) => b - a);
   const [numOne, numTwo, numThree] = parsedResults;
 
@@ -26,5 +27,10 @@ import * as path from 'path';
     0
   );
 
-  console.info(answerTwo);
-})();
+  if (part === 'pt2') {
+    return answerTwo;
+  }
+  throw new Error('Part must be defined!');
+};
+
+export default main;
